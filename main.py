@@ -8,12 +8,12 @@ from readObject import readObject
 from transform import *
 from constants import *
 
-OBJECT_FILE = "objects/teapot.obj"
+# OBJECT_FILE = "objects/teapot.obj"
 # OBJECT_FILE = "objects/teddy.obj"
 # OBJECT_FILE = "objects/pumpkin.obj"
 # OBJECT_FILE = "objects/test.obj"
 # OBJECT_FILE = "objects/square.obj"
-# OBJECT_FILE = "objects/cube.obj"
+OBJECT_FILE = "objects/cube.obj"
 
 viewer_pos = VIEWERPOS
 
@@ -38,6 +38,8 @@ def get_xy(point):
 
 vertices, faces = readObject(OBJECT_FILE)
 
+feetVertices, bin = readObject("objects/feet.obj")
+
 
 class Cube:
 
@@ -58,11 +60,6 @@ objects = [
     Cube([0, 0, 0], 150, [0, 1050, 200]),
     Cube([0, 0, 0], 150, [0, 1350, 200]),
     Cube([0, 0, 0], 150, [0, 1650, 200]),
-]
-
-objects = [
-    # Cube([0, 0, 0], 50000, [50000, 50000, 50000]),
-    Cube([0, 0, 0], 150, [300, 150, 300]),
 ]
 
 if __name__ == "__main__":
@@ -126,6 +123,35 @@ if __name__ == "__main__":
 
         # RESET SCREEN
         screen.fill(BLACK)
+
+        corns = [
+            transform_point(
+                vertex, rotation_matrix(0, -xpivot_rotation, 0), 25, [0, 0, 0]
+            )
+            for vertex in feetVertices
+        ]
+
+        corns = [
+            [point[0] + viewer_pos[0], point[1], point[2] + viewer_pos[2]]
+            for point in corns
+        ]
+
+        corns = [map_to_viewer(point, viewer_pos) for point in corns]
+        Rcorns = [
+            rotate_point(point, rotation_matrix(ypivot_rotation, xpivot_rotation, 0))
+            for point in corns
+        ]
+
+        corns = [projected_pos(point) for point in Rcorns]
+        corns = [viewer_to_screen(point) for point in corns]
+
+        skip = False
+        for corner in Rcorns:
+            if corner[2] < 0:
+                skip = True
+
+        if not skip:
+            pygame.draw.polygon(screen, RED, corns)
 
         pygame.draw.line(screen, GREEN, [0, HEIGHT / 2], [WIDTH, HEIGHT / 2])
 

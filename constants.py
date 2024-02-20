@@ -2,9 +2,9 @@ import math
 
 WIDTH = 720
 HEIGHT = 720
-FPS = 12
+FPS = 24
 
-SPEED = 30
+SPEED = 20
 
 # Define Colors
 WHITE = (255, 255, 255)
