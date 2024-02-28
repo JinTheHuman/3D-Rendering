@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from constants import VIEWERPOS, HEIGHT, WIDTH
+from configs import VIEWERPOS, HEIGHT, WIDTH
 
 
 def rotation_matrix(angle_x, angle_y, angle_z):
@@ -90,3 +90,12 @@ def screen_to_viewer(pos, viewer_pos=VIEWERPOS):
     z = pos[2]
 
     return x, y, z
+
+
+def move_at_angle(angle, speed, pos):
+    new_pos = [0, 0, 0]
+    new_pos[0] = pos[0] + speed * np.sin(-angle)
+    new_pos[1] = pos[1]
+    new_pos[2] = pos[2] + speed * np.cos(-angle)
+
+    return new_pos

@@ -6,7 +6,7 @@ import numpy as np
 import math
 from readObject import readObject
 from transform import *
-from constants import *
+from configs import *
 
 # OBJECT_FILE = "objects/teapot.obj"
 # OBJECT_FILE = "objects/teddy.obj"
@@ -51,15 +51,15 @@ class Cube:
 
 objects = [
     Cube([0, 0, 0], 150, [0, 150, 200]),
-    Cube([0, 0, 0], 150, [0, 450, 200]),
-    Cube([0, 0, 0], 150, [400, 150, 200]),
-    Cube([0, 0, 0], 150, [0, 150, 550]),
-    Cube([0, 0, 0], 150, [0, 450, 550]),
-    Cube([0, 0, 0], 150, [400, 150, 550]),
-    Cube([0, 0, 0], 150, [0, 750, 200]),
-    Cube([0, 0, 0], 150, [0, 1050, 200]),
-    Cube([0, 0, 0], 150, [0, 1350, 200]),
-    Cube([0, 0, 0], 150, [0, 1650, 200]),
+    # Cube([0, 0, 0], 150, [0, 450, 200]),
+    # Cube([0, 0, 0], 150, [400, 150, 200]),
+    # Cube([0, 0, 0], 150, [0, 150, 550]),
+    # Cube([0, 0, 0], 150, [0, 450, 550]),
+    # Cube([0, 0, 0], 150, [400, 150, 550]),
+    # Cube([0, 0, 0], 150, [0, 750, 200]),
+    # Cube([0, 0, 0], 150, [0, 1050, 200]),
+    # Cube([0, 0, 0], 150, [0, 1350, 200]),
+    # Cube([0, 0, 0], 150, [0, 1650, 200]),
 ]
 
 if __name__ == "__main__":
@@ -78,6 +78,7 @@ if __name__ == "__main__":
     while running:
         clock.tick(FPS)
 
+        # calulate facing angle
         xratio = (pygame.mouse.get_pos()[0] / WIDTH) - 0.5
         xpivot_rotation = -xratio * 2 * math.pi
 
@@ -101,13 +102,13 @@ if __name__ == "__main__":
 
         # Movement
         if pressed[pygame.K_w]:
-            viewer_pos[2] += SPEED
+            viewer_pos = move_at_angle(xpivot_rotation, SPEED, viewer_pos)
         elif pressed[pygame.K_s]:
-            viewer_pos[2] -= SPEED
+            viewer_pos = move_at_angle(math.pi + xpivot_rotation, SPEED, viewer_pos)
         if pressed[pygame.K_a]:
-            viewer_pos[0] -= SPEED
+            viewer_pos = move_at_angle(math.pi / 2 + xpivot_rotation, SPEED, viewer_pos)
         elif pressed[pygame.K_d]:
-            viewer_pos[0] += SPEED
+            viewer_pos = move_at_angle(xpivot_rotation - math.pi / 2, SPEED, viewer_pos)
 
         if isJumping:
             if jumpCount >= -10:
@@ -124,6 +125,7 @@ if __name__ == "__main__":
         # RESET SCREEN
         screen.fill(BLACK)
 
+        # Draw standing square
         corns = [
             transform_point(
                 vertex, rotation_matrix(0, -xpivot_rotation, 0), 25, [0, 0, 0]
@@ -163,6 +165,7 @@ if __name__ == "__main__":
             translation = cube.translation
             scale = cube.scale
 
+            # draw edges
             for face in faces:
                 world_plane = [
                     transform_point(vertices[vertex - 1], rotation, scale, translation)
@@ -191,31 +194,23 @@ if __name__ == "__main__":
                 if relative_plane[2][2] > 0 and relative_plane[0][2] > 0:
                     pygame.draw.line(screen, WHITE, plane[2], plane[0])
 
-            for vertex in vertices:
-                world_point = transform_point(vertex, rotation, scale, translation)
+            # Draw corners
+            # for vertex in vertices:
+            #     world_point = transform_point(vertex, rotation, scale, translation)
 
-                relative_point = map_to_viewer(world_point, viewer_pos)
+            #     relative_point = map_to_viewer(world_point, viewer_pos)
 
-                relative_point = rotate_point(
-                    relative_point, rotation_matrix(ypivot_rotation, xpivot_rotation, 0)
-                )
+            #     relative_point = rotate_point(
+            #         relative_point, rotation_matrix(ypivot_rotation, xpivot_rotation, 0)
+            #     )
 
-                projected_point = projected_pos(relative_point)
-                screen_pos = viewer_to_screen(projected_point)
+            #     projected_point = projected_pos(relative_point)
+            #     screen_pos = viewer_to_screen(projected_point)
 
-                # if vertex == [0,0,0]:
-                #   print('--------------', '----------------')
-                #   # print('raw vertex', vertex)
-                #   print('world_point', world_point)
-                #   print('relative: ', relative_point)
-                #   print('viewer_pos', viewer_pos)
-                #   print('projected_point: ', projected_point)
-                #   print('screen_pos', screen_pos)
+            #     if relative_point[2] <= 0:
+            #         continue
 
-                if relative_point[2] <= 0:
-                    continue
-
-                pygame.draw.circle(screen, RED, screen_pos, 4)
+            #     pygame.draw.circle(screen, RED, screen_pos, 4)
 
         pygame.display.flip()
 

@@ -2,7 +2,7 @@ import math
 
 WIDTH = 720
 HEIGHT = 720
-FPS = 24
+FPS = 8
 
 SPEED = 20
 
